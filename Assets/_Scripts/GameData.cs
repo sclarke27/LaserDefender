@@ -26,6 +26,8 @@ public class GameData : MonoBehaviour {
     private float currSFXVolume;
     private int totalHighScores = 25;
     private ArrayList highScoreList = new ArrayList();
+    private bool playerReady = false;
+    private bool hasSeenInstructions = false;
 
     private bool leftPaddledown = false;
     private bool rightPaddledown = false;
@@ -72,6 +74,31 @@ public class GameData : MonoBehaviour {
         {
             playerOne = GameObject.FindObjectOfType<PlayerShip>();
         }
+    }
+
+
+    public void SetPlayerReady(bool isReady)
+    {
+        playerReady = isReady;
+        if (playerReady)
+        {
+            Screen.showCursor = false;
+        }
+    }
+
+    public bool IsPlayerReady()
+    {
+        return playerReady;
+    }
+
+    public bool PlayerViewedInstructions()
+    {
+        return hasSeenInstructions;
+    }
+
+    public void SetInstructionsViewed()
+    {
+        hasSeenInstructions = true;
     }
 
     public void ResetPlayerScore()

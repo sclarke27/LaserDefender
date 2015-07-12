@@ -92,7 +92,7 @@ public class LevelManager : MonoBehaviour
         //gameData.PauseGame(false);
         gameData.SetPaddle("right", false);
         gameData.SetPaddle("left", false);
-        gameHUD.SetPlayerReady(false);
+        gameData.SetPlayerReady(false);
         //playerBall.ShowBallDestruction();
         //playerBall.LockBall();
     }

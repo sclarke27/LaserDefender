@@ -9,6 +9,7 @@ public class EnemyShip : MonoBehaviour
     private float firingYOffset = -0.25f;
     private Animator shipAnimator;
     public bool fire = false;
+    public bool destroy = false;
 
     public static int enemyCount = 0;
     private int currentHealth;
@@ -31,6 +32,11 @@ public class EnemyShip : MonoBehaviour
     {
         if (!gameData.IsGamePaused())
         {
+            if (destroy)
+            {
+                Destroy(gameObject);
+                return;
+            }
             int randVal = Random.Range(0, 1000);
             if (randVal == 50)
             {
@@ -44,7 +50,6 @@ public class EnemyShip : MonoBehaviour
             }
         }
     }
-
 
     public void FireProjectile()
     {
@@ -60,7 +65,7 @@ public class EnemyShip : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collidingObject)
     {
-        if (collidingObject.name.IndexOf("Projectile") >= 0)
+        if (collidingObject.name.IndexOf("Projectile") >= 0 && !destroy)
         {
             Projectile projectile = collidingObject.gameObject.GetComponent<Projectile>() as Projectile;
             currentHealth = currentHealth - projectile.GetDestructionAmount();
@@ -72,7 +77,7 @@ public class EnemyShip : MonoBehaviour
             }
             else
             {
-                Destroy(gameObject);
+                shipAnimator.SetTrigger("Destroyed");
                 enemyCount--;
                 if (EnemyShip.enemyCount <= 0)
                 {

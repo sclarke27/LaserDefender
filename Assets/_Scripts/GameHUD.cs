@@ -37,9 +37,8 @@ public class GameHUD : MonoBehaviour
 
     private GameData gameData;
     //private LevelManager levelManager;
-    private bool playerReady = false;
+    
     private string nextLevel;
-    private bool hasSeenInstructions = false;
     //private Ball ball;
 
     
@@ -116,6 +115,9 @@ public class GameHUD : MonoBehaviour
                 break;
             case "rightDown":
                 gameData.SetPaddle("right", true);
+                break;
+            case "fire":
+                gameData.FirePlayerProjectile();
                 break;
         }
     }
@@ -210,25 +212,11 @@ public class GameHUD : MonoBehaviour
         }
     }
 
-    public void SetPlayerReady(bool isReady)
-    {
-        playerReady = isReady;
-        if (playerReady)
-        {
-            Screen.showCursor = false;
-        }
-    }
-
-    public bool IsPlayerReady()
-    {
-        return playerReady;
-    }
-
     public void HandlePlayerReady()
     {
         Screen.showCursor = false;
-        hasSeenInstructions = true;
-        SetPlayerReady(true);
+        gameData.SetInstructionsViewed();
+        gameData.SetPlayerReady(true);
         //ball.LaunchBall();
     }
 
@@ -263,7 +251,7 @@ public class GameHUD : MonoBehaviour
                 gameData.FirePlayerProjectile();
             }
 
-            if (!IsPlayerReady())
+            if (!gameData.IsPlayerReady())
             {
 
                 //wait for player to hit space bar
@@ -273,7 +261,7 @@ public class GameHUD : MonoBehaviour
                 }
 
                 //if player has not seen the instructions, show them else show ready panel
-                if (isFirstLevel && !hasSeenInstructions)
+                if (isFirstLevel && !gameData.PlayerViewedInstructions())
                 {
                     instructionsPanel.SetActive(true);
                     readyPanel.SetActive(false);
@@ -329,11 +317,6 @@ public class GameHUD : MonoBehaviour
             //we are in a menu screen
             Screen.showCursor = true;
         }
-    }
-
-    public void HandleDiffcultySlider()
-    {
-        gameData.SetDifficulty(difficultySlider.value);
     }
 
     public void ShowLevelComplete()

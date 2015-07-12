@@ -157,6 +157,7 @@ public class PlayerShip : MonoBehaviour
             }
             else
             {
+                
                 /*
                 Destroy(gameObject);
                 if (EnemyShip.enemyCount <= 0)
