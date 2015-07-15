@@ -12,10 +12,8 @@ public class GameHUD : MonoBehaviour
     public Text livesTextField;
     public string pausedText = "Game\nPaused";
     public Text pausedTextField;
-    public Text pausedTextFieldShadow;
     public Button restartButton;
     public Button quitButton;
-    public Slider difficultySlider;
     public bool isMenuScreen;
     public bool isStartMenu = false;
     public bool isEndScreen = false;
@@ -48,15 +46,17 @@ public class GameHUD : MonoBehaviour
         gameData = GameObject.FindObjectOfType<GameData>();
         //levelManager = GameObject.FindObjectOfType<LevelManager>();
 
-        if (!isMenuScreen && (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))
+        if (mobileOverlayPanel != null)
         {
-            mobileOverlayPanel.SetActive(true);
+            if (!isMenuScreen && (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer))
+            {
+                mobileOverlayPanel.SetActive(true);
+            }
+            else if (!isMenuScreen)
+            {
+                mobileOverlayPanel.SetActive(false);
+            }
         }
-        else if(!isMenuScreen)
-        {
-            mobileOverlayPanel.SetActive(false);
-        }
-
     }
 
     // Use this for initialization
@@ -67,7 +67,6 @@ public class GameHUD : MonoBehaviour
             scoreTextField.text = "";
             livesTextField.text = "";
             pausedTextField.text = "";
-            pausedTextFieldShadow.text = "";
             pausePanel.SetActive(false);
             readyPanel.SetActive(false);
             instructionsPanel.SetActive(false);
@@ -80,7 +79,6 @@ public class GameHUD : MonoBehaviour
             {
                 gameAnalytics.LogScreen("Start Screen");
                 SetupHighScoresPanel();
-                difficultySlider.value = gameData.GetDifficultyLevel();
             }
             if (isEndScreen)
             {
@@ -297,13 +295,11 @@ public class GameHUD : MonoBehaviour
                 {
                     pausePanel.SetActive(true);
                     pausedTextField.text = pausedText;
-                    pausedTextFieldShadow.text = pausedText;
                 }
                 else
                 {
                     pausePanel.SetActive(false);
                     pausedTextField.text = "";
-                    pausedTextFieldShadow.text = "";
  
                 }
 

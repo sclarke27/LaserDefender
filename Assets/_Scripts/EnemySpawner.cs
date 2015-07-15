@@ -9,6 +9,7 @@ public class EnemySpawner : MonoBehaviour
     public GameObject EnemyShipSmall;
     public float formationWidth = 10f;
     public float formationHeight = 5f;
+    public float spawnDelay = 0.5f;
 
     private float formationMovementAmount = 1.5f;
     private bool moveLeft = true;
@@ -16,6 +17,8 @@ public class EnemySpawner : MonoBehaviour
     private float distanceToCamera;
     private Vector3 rightEdge;
     private GameData gameData;
+    private LevelManager levelManager;
+    private bool formationSpawned = false;
 
     public enum EnemyTypes
     {
@@ -30,28 +33,44 @@ public class EnemySpawner : MonoBehaviour
         distanceToCamera = transform.position.z - Camera.main.transform.position.z;
         rightEdge = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, distanceToCamera));
         gameData = GameObject.FindObjectOfType<GameData>();
+        levelManager = GameObject.FindObjectOfType<LevelManager>();
 
-        foreach (Transform child in transform)
-        {
-            GameObject newEnemy;
-            switch (child.gameObject.GetComponent<EnemySpawnPosition>().GetEnemyType())
-            {
-                case EnemyTypes.Large:
-                    newEnemy = Instantiate(EnemyShipLarge, child.transform.position, child.transform.rotation) as GameObject;
-                    newEnemy.transform.parent = child;
-                    break;
-                case EnemyTypes.Medium:
-                    newEnemy = Instantiate(EnemyShipMedium, child.transform.position, child.transform.rotation) as GameObject;
-                    newEnemy.transform.parent = child;
-                    break;
-                case EnemyTypes.Small:
-                    newEnemy = Instantiate(EnemyShipSmall, child.transform.position, child.transform.rotation) as GameObject;
-                    newEnemy.transform.parent = child;
-                    break;
-            }
-        }
+        //SpawnFullFormation();
 
         offsetWidth = formationWidth / 2;
+    }
+
+    void SpawnFullFormation()
+    {
+        Transform nextSpawnPoint = NextFreePosition();
+        if (nextSpawnPoint != null)
+        {
+            SpawnEnemy(nextSpawnPoint.gameObject.GetComponent<EnemySpawnPosition>().GetEnemyType(), nextSpawnPoint);
+            Invoke("SpawnFullFormation", spawnDelay);
+        }
+        
+    }
+
+    public GameObject SpawnEnemy(EnemyTypes enemyType, Transform targetSpawner)
+    {
+        GameObject newEnemy;
+        GameObject enemyShipObject = EnemyShipLarge;
+        switch (enemyType)
+        {
+            case EnemyTypes.Large:
+                enemyShipObject = EnemyShipLarge;
+                break;
+            case EnemyTypes.Medium:
+                enemyShipObject = EnemyShipMedium;
+                break;
+            case EnemyTypes.Small:
+                enemyShipObject = EnemyShipSmall;
+                break;
+        }
+        newEnemy = Instantiate(enemyShipObject, targetSpawner.transform.position, targetSpawner.transform.rotation) as GameObject;
+        newEnemy.transform.parent = targetSpawner;
+
+        return newEnemy;
     }
 
     void OnDrawGizmos()
@@ -59,11 +78,50 @@ public class EnemySpawner : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, new Vector3(formationWidth, formationHeight, 0f));
     }
 
+    public bool AllEnemiesDead() 
+    {
+
+        foreach (Transform spawnPoint in transform)
+        {
+            if (spawnPoint.transform.childCount != 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public Transform NextFreePosition()
+    {
+        foreach (Transform spawnPoint in transform)
+        {
+            if (spawnPoint.transform.childCount == 0)
+            {
+                return spawnPoint;
+            }
+        }
+
+        return null;
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (!gameData.IsGamePaused())
         {
+            if (!formationSpawned)
+            {
+                if (gameData.IsPlayerReady())
+                {
+                    SpawnFullFormation();
+                    formationSpawned = true;
+                }
+            }
+            if (AllEnemiesDead() && gameData.IsPlayerReady())
+            {
+                levelManager.ShowLevelComplete();
+            }
 
             Vector3 newVector = transform.position;
             if (moveLeft)

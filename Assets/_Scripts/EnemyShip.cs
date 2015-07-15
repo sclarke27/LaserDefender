@@ -6,25 +6,23 @@ public class EnemyShip : MonoBehaviour
 
     public GameObject defaultProjectile;
     public int maxHealth = 200;
+    public int scoreValue = 1000;
     private float firingYOffset = -0.25f;
     private Animator shipAnimator;
     public bool fire = false;
     public bool destroy = false;
 
-    public static int enemyCount = 0;
     private int currentHealth;
 
-    private LevelManager levelManager;
     private GameData gameData;
 
     // Use this for initialization
     void Start()
     {
-        levelManager = GameObject.FindObjectOfType<LevelManager>();
         gameData = GameObject.FindObjectOfType<GameData>();
         shipAnimator = GetComponent<Animator>();
+        shipAnimator.SetTrigger("Arrival");
         currentHealth = maxHealth;
-        enemyCount++;
     }
 
     // Update is called once per frame
@@ -34,10 +32,11 @@ public class EnemyShip : MonoBehaviour
         {
             if (destroy)
             {
+                gameData.AddPlayerScore(scoreValue);
                 Destroy(gameObject);
                 return;
             }
-            int randVal = Random.Range(0, 1000);
+            int randVal = Random.Range(0, 300);
             if (randVal == 50)
             {
                 FireProjectile();
@@ -78,11 +77,6 @@ public class EnemyShip : MonoBehaviour
             else
             {
                 shipAnimator.SetTrigger("Destroyed");
-                enemyCount--;
-                if (EnemyShip.enemyCount <= 0)
-                {
-                    levelManager.ShowLevelComplete();
-                }
             }
         }
     }

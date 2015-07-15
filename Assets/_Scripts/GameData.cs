@@ -14,6 +14,7 @@ public class GameData : MonoBehaviour {
     public int defaultPlayerLives = 5;
     public GameAnalytics gameAnalytics;
     public AudioSource collect1UpSound;
+    public PlayerShip playerStartingShip;
 
     private float ballStartingVelocity = 7.0f;
     private bool useAI = false;
@@ -27,12 +28,13 @@ public class GameData : MonoBehaviour {
     private int totalHighScores = 25;
     private ArrayList highScoreList = new ArrayList();
     private bool playerReady = false;
-    private bool hasSeenInstructions = false;
+    private bool hasSeenInstructions = true;
 
     private bool leftPaddledown = false;
     private bool rightPaddledown = false;
 
     private PlayerShip playerOne;
+    private LevelManager levelManager;
 
     public enum playerPrefTypes
     {
@@ -47,6 +49,7 @@ public class GameData : MonoBehaviour {
     {
         if (instance == null)
         {
+            levelManager = GameObject.FindObjectOfType<LevelManager>();
             DontDestroyOnLoad(gameObject);
             instance = this;
             SetMusicVolume(PlayerPrefs.GetFloat(playerPrefTypes.musicVolume.ToString(), defaultMusicVolume));
@@ -56,6 +59,7 @@ public class GameData : MonoBehaviour {
             SetPlayerPaddleSpeed(PlayerPrefs.GetFloat(playerPrefTypes.paddleSpeed.ToString(), defaultPaddleSpeed));
             LoadHighScores();
             ResetPlayerLives();
+
         }
         else if (this != instance)
         {
@@ -76,6 +80,23 @@ public class GameData : MonoBehaviour {
         }
     }
 
+    public void SpawnPlayer()
+    {
+        if (playerOne != null)
+        {
+            RemovePlayer();
+        }
+        playerOne = Instantiate(playerStartingShip, new Vector3(8f, 0.5f, 0f), Quaternion.identity) as PlayerShip;
+    }
+
+    public void RemovePlayer()
+    {
+        if (playerOne != null)
+        {
+            Destroy(playerOne.gameObject);
+        }
+    }
+
 
     public void SetPlayerReady(bool isReady)
     {
@@ -83,6 +104,11 @@ public class GameData : MonoBehaviour {
         if (playerReady)
         {
             Screen.showCursor = false;
+            SpawnPlayer();
+        }
+        else
+        {
+            RemovePlayer();
         }
     }
 
@@ -217,7 +243,7 @@ public class GameData : MonoBehaviour {
         }
         if (gameAnalytics != null)
         {
-            gameAnalytics.LogEvent(GameAnalytics.gaEventCategories.GameEvent, "gamePaused", "Game Paused");
+            //gameAnalytics.LogEvent(GameAnalytics.gaEventCategories.GameEvent, "gamePaused", "Game Paused");
         }
 
     }
@@ -378,6 +404,16 @@ public class GameData : MonoBehaviour {
     {
         Debug.Log("fire");
         playerOne.FireProjectile();
+    }
+
+    public void PlayerDestoryed()
+    {
+        SetPlayerReady(false);
+        LoseOneLife();
+        if (GetPlayerRemainingLives() <= 0)
+        {
+            levelManager.LoadLevel("EndScreen");
+        }
     }
 
 }

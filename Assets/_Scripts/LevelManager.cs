@@ -24,6 +24,7 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel(string name)
     {
+        Debug.Log("load level");
         gameData.SetPaddle("right", false);
         gameData.SetPaddle("left", false);
 
@@ -58,8 +59,9 @@ public class LevelManager : MonoBehaviour
 
     public void StartGame()
     {
+        Debug.Log("Start Game");
         Screen.showCursor = false;
-        gameData.PauseGame(false);
+        gameData.SetPlayerReady(false);
         gameData.ResetPlayerLives();
         gameData.ResetPlayerScore();
         musicPlayer.SetInMenu(false);

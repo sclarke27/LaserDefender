@@ -11,14 +11,14 @@ public class MusicPlayer : MonoBehaviour
     public AudioSource menuBgMusic3;
     private bool isPlaying = false;
     private GameData gameData;
-    private bool isInMenus;
+    //private bool isInMenus;
 
 
     // Use this for initialization
     void Awake()
     {
         gameData = GameObject.FindObjectOfType<GameData>(); //used to get music volume
-        isInMenus = true;
+        //isInMenus = false;
         if (musicPlayer == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -32,6 +32,7 @@ public class MusicPlayer : MonoBehaviour
 
     public void SetInMenu(bool inMenu)
     {
+        /*
         if (isInMenus != inMenu)
         {
             isInMenus = inMenu;
@@ -41,10 +42,12 @@ public class MusicPlayer : MonoBehaviour
             menuBgMusic3.Stop();
             isPlaying = false;
         }
+         */
     }
 
     void Start()
     {
+        /*
         if (isInMenus)
         {
             if (!isPlaying)
@@ -58,18 +61,20 @@ public class MusicPlayer : MonoBehaviour
         }
         else
         {
+         */
             if (!isPlaying)
             {
                 bgMusic.Play();
                 isPlaying = true;
             }
-        }
+        //}
     }
 
     // Update is called once per frame
     void Update()
     {
         float volume = gameData.GetMusicVolume();
+        /*
         if (isInMenus)
         {
             menuBgMusic1.volume = volume;
@@ -86,12 +91,13 @@ public class MusicPlayer : MonoBehaviour
         }
         else
         {
+         */
             bgMusic.volume = volume;
             if (bgMusic != null && !isPlaying)
             {
                 bgMusic.Play();
                 isPlaying = true;
             }
-        }
+        //}
     }
 }

@@ -12,7 +12,6 @@ public class OptionsPanel : MonoBehaviour
     // player pref UI Fields
     public Slider musicVolSlider;
     public Slider sfxVolSlider;
-    public Toggle useAIToggle;
     public GameAnalytics gameAnalytics;
     
 
@@ -48,7 +47,6 @@ public class OptionsPanel : MonoBehaviour
         {
             musicVolSlider.value = gameData.GetMusicVolume();
             sfxVolSlider.value = gameData.GetSFXVolume();
-            useAIToggle.isOn = gameData.GetAIEnabled();
         }
     }
 
@@ -56,7 +54,6 @@ public class OptionsPanel : MonoBehaviour
     {
         gameData.SetMusicVolume(musicVolSlider.value);
         gameData.SetSFXVolume(sfxVolSlider.value);
-        gameData.SetAIEnabled(useAIToggle.isOn);
         PopulateDefaultValues();
         ShowOptionsPanel(false);
     }

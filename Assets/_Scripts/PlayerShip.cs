@@ -145,7 +145,7 @@ public class PlayerShip : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collidingObject)
     {
-        if (collidingObject.name.IndexOf("Projectile") >= 0)
+        if (collidingObject.name.IndexOf("Enemy") >= 0 && collidingObject.name.IndexOf("Projectile") >= 0)
         {
             Projectile projectile = collidingObject.gameObject.GetComponent<Projectile>() as Projectile;
             currentHealth = currentHealth - projectile.GetDestructionAmount();
@@ -157,7 +157,8 @@ public class PlayerShip : MonoBehaviour
             }
             else
             {
-                
+
+                gameData.PlayerDestoryed();
                 /*
                 Destroy(gameObject);
                 if (EnemyShip.enemyCount <= 0)

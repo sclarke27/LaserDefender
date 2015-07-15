@@ -38,6 +38,11 @@ public class GameAnalytics : MonoBehaviour
 
     }
 
+    public bool IsAnalyticsEnabled()
+    {
+        return isAnalyticsEnabled;
+    }
+
     public void EnableAnalytics(bool enable)
     {
         isAnalyticsEnabled = enable;
@@ -47,7 +52,12 @@ public class GameAnalytics : MonoBehaviour
     {
         if (isAnalyticsEnabled && googleAnalytics != null)
         {
-            googleAnalytics.LogScreen(screenName);
+			try {
+	            googleAnalytics.LogScreen(screenName);
+			} catch(System.Exception exception) {
+				Debug.Log(exception);
+			}
+
         }
     }
 
@@ -55,11 +65,15 @@ public class GameAnalytics : MonoBehaviour
     {
         if (isAnalyticsEnabled == true && googleAnalytics != null)
         {
-            googleAnalytics.LogEvent(new EventHitBuilder()
-                .SetEventCategory(eventType.ToString())
-                .SetEventAction(actionTaken)
-                .SetEventLabel(label)
-                .SetEventValue(eventValue));
+			try {
+	            googleAnalytics.LogEvent(new EventHitBuilder()
+	                .SetEventCategory(eventType.ToString())
+	                .SetEventAction(actionTaken)
+	                .SetEventLabel(label)
+	                .SetEventValue(eventValue));
+			} catch(System.Exception exception) {
+				Debug.Log(exception);
+			}
         }
     }
 
