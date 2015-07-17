@@ -55,7 +55,7 @@ public class GameAnalytics : MonoBehaviour
 			try {
 	            googleAnalytics.LogScreen(screenName);
 			} catch(System.Exception exception) {
-				Debug.Log(exception);
+				//Debug.Log(exception);
 			}
 
         }
@@ -72,7 +72,7 @@ public class GameAnalytics : MonoBehaviour
 	                .SetEventLabel(label)
 	                .SetEventValue(eventValue));
 			} catch(System.Exception exception) {
-				Debug.Log(exception);
+				//Debug.Log(exception);
 			}
         }
     }

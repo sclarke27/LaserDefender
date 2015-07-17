@@ -277,14 +277,22 @@ public class GameHUD : MonoBehaviour
                 //listen for pause keys
                 if (Input.GetKeyDown(KeyCode.P) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKey(KeyCode.Menu))
                 {
-                    gameData.PauseGame(!gameData.IsGamePaused());
-                    if (gameData.IsGamePaused())
+                    OptionsPanel optionsPanel = GameObject.FindObjectOfType<OptionsPanel>();
+                    if (optionsPanel != null)
                     {
-                        Screen.showCursor = true;
+                        optionsPanel.ShowOptionsPanel(false);
                     }
                     else
                     {
-                        Screen.showCursor = false;
+                        gameData.PauseGame(!gameData.IsGamePaused());
+                        if (gameData.IsGamePaused())
+                        {
+                            Screen.showCursor = true;
+                        }
+                        else
+                        {
+                            Screen.showCursor = false;
+                        }
                     }
                 }
 
@@ -317,7 +325,7 @@ public class GameHUD : MonoBehaviour
 
     public void ShowLevelComplete()
     {
-        Screen.showCursor = true;
+        //Screen.showCursor = true;
         levelCompletePanel.SetActive(true);
     }
 }

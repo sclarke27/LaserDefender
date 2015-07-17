@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerShip : MonoBehaviour
+public class PlayerShip : BaseGameObject
 {
 
     public float shipScreenOffset = 0.172f;
@@ -18,20 +18,18 @@ public class PlayerShip : MonoBehaviour
     private float currAccleration = 0f;
     private float currStep = 0;
 
-    private GameData gameData;
-
-
 
     // Use this for initialization
-    void Start()
+    new void Start()
     {
-        gameData = GameObject.FindObjectOfType<GameData>();
+        base.Start();
         currentHealth = maxHealth;
     }
 
     // Update is called once per frame
-    void Update()
+    new void Update()
     {
+        base.Update();
         if (!gameData.IsGamePaused())
         {
 
@@ -127,11 +125,13 @@ public class PlayerShip : MonoBehaviour
                 currStep = 0f;
             }
             //stop at wall
-            if ((this.transform.position.x >= gameData.levelUnitPixelWidth - shipScreenOffset && newVelocityX > 0) || (this.transform.position.x <= shipScreenOffset && newVelocityX < 0))
+            Vector2 maxBounds = gameData.GetMaxScreenBounds();
+            Vector2 minBounds = gameData.GetMinScreenBounds();
+            if ((this.transform.position.x >= maxBounds.x && newVelocityX > 0) || (this.transform.position.x <= minBounds.x && newVelocityX < 0))
             {
                 newVelocityX = 0.0f;
                 Vector2 paddlePos = this.transform.position;
-                paddlePos.x = Mathf.Clamp(paddlePos.x, shipScreenOffset, gameData.levelUnitPixelWidth - shipScreenOffset);
+                paddlePos.x = Mathf.Clamp(paddlePos.x, minBounds.x, maxBounds.x);
                 this.transform.position = paddlePos;
                 currAccleration = 0f;
             }
@@ -140,6 +140,19 @@ public class PlayerShip : MonoBehaviour
             shipVelocity = newVelocityX;
             this.rigidbody2D.velocity = new Vector2(shipVelocity, 0.0f);
         }
+        if (finishDestruction)
+        {
+            DestroyGameObject();
+        }
+
+    }
+
+
+    new public void DestroyGameObject()
+    {
+        gameData.LoseOneLife();
+        gameData.SetPlayerReady(false);
+        base.DestroyGameObject();
 
     }
 
@@ -150,29 +163,26 @@ public class PlayerShip : MonoBehaviour
             Projectile projectile = collidingObject.gameObject.GetComponent<Projectile>() as Projectile;
             currentHealth = currentHealth - projectile.GetDestructionAmount();
             Debug.Log("player hit: " + projectile.GetDestructionAmount());
-
-            if (currentHealth > 0)
+            if (destructionSound != null)
             {
-                shipAnimator.SetTrigger("TookDamage");
+                AudioSource.PlayClipAtPoint(destructionSound, this.transform.position, gameData.GetSFXVolume());
             }
-            else
-            {
 
-                gameData.PlayerDestoryed();
-                /*
-                Destroy(gameObject);
-                if (EnemyShip.enemyCount <= 0)
-                {
-                    levelManager.ShowLevelComplete();
-                }
-                 */
-            }
+            shipAnimator.SetTrigger("Destroyed");
+
         }
     }
 
     public void FireProjectile()
     {
-        Instantiate(defaultProjectile, transform.position, transform.rotation);
+        if (!gameData.IsGamePaused() && gameData.IsPlayerReady()  && !destroyed)
+        {
+            if (firingSound != null)
+            {
+                AudioSource.PlayClipAtPoint(firingSound, this.transform.position, gameData.GetSFXVolume());
+            }
+            Instantiate(defaultProjectile, transform.position, transform.rotation);
+        }
     }
 
 }

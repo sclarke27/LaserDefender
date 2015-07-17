@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyShip : MonoBehaviour
+public class EnemyShip : BaseGameObject
 {
 
     public GameObject defaultProjectile;
@@ -14,20 +14,19 @@ public class EnemyShip : MonoBehaviour
 
     private int currentHealth;
 
-    private GameData gameData;
-
     // Use this for initialization
-    void Start()
+    new void Start()
     {
-        gameData = GameObject.FindObjectOfType<GameData>();
+        base.Start();
         shipAnimator = GetComponent<Animator>();
         shipAnimator.SetTrigger("Arrival");
         currentHealth = maxHealth;
     }
 
     // Update is called once per frame
-    void Update()
+    new void Update()
     {
+        base.Update();
         if (!gameData.IsGamePaused())
         {
             if (destroy)
@@ -52,13 +51,19 @@ public class EnemyShip : MonoBehaviour
 
     public void FireProjectile()
     {
-        shipAnimator.SetTrigger("FireWeapons");
-        //Instantiate(defaultProjectile, transform.position, Quaternion.identity);
+        if (gameData.IsPlayerReady())
+        {
+            shipAnimator.SetTrigger("FireWeapons");
+            //Instantiate(defaultProjectile, transform.position, Quaternion.identity);
+        }
     }
 
     public void DoProjectileFiring()
     {
-
+        if (firingSound != null)
+        {
+            AudioSource.PlayClipAtPoint(firingSound, this.transform.position, gameData.GetSFXVolume());
+        }
         Instantiate(defaultProjectile, new Vector3(transform.position.x, transform.position.y + firingYOffset, transform.position.z), Quaternion.identity);
     }
 
@@ -76,6 +81,10 @@ public class EnemyShip : MonoBehaviour
             }
             else
             {
+                if (destructionSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(destructionSound, this.transform.position, gameData.GetSFXVolume());
+                }
                 shipAnimator.SetTrigger("Destroyed");
             }
         }

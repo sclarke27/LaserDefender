@@ -29,6 +29,9 @@ public class GameData : MonoBehaviour {
     private ArrayList highScoreList = new ArrayList();
     private bool playerReady = false;
     private bool hasSeenInstructions = true;
+    public Vector2 minScreenBounds;
+    public Vector2 maxScreenBounds;
+
 
     private bool leftPaddledown = false;
     private bool rightPaddledown = false;
@@ -49,6 +52,12 @@ public class GameData : MonoBehaviour {
     {
         if (instance == null)
         {
+
+            Camera mainCam = GameObject.FindObjectOfType<Camera>();
+            Vector2 extents = new Vector2(mainCam.orthographicSize * Screen.width / Screen.height, mainCam.orthographicSize);
+            minScreenBounds = (Vector2)mainCam.transform.position - extents;
+            maxScreenBounds = (Vector2)mainCam.transform.position + extents;
+
             levelManager = GameObject.FindObjectOfType<LevelManager>();
             DontDestroyOnLoad(gameObject);
             instance = this;
@@ -74,10 +83,27 @@ public class GameData : MonoBehaviour {
 
     void Update()
     {
+        Camera mainCam = GameObject.FindObjectOfType<Camera>();
+        Vector2 extents = new Vector2(mainCam.orthographicSize * Screen.width / Screen.height, mainCam.orthographicSize);
+        minScreenBounds = (Vector2)mainCam.transform.position - extents;
+        maxScreenBounds = (Vector2)mainCam.transform.position + extents;
+
         if (playerOne == null)
         {
             playerOne = GameObject.FindObjectOfType<PlayerShip>();
         }
+        
+    }
+
+
+    public Vector2 GetMinScreenBounds()
+    {
+        return minScreenBounds;
+    }
+
+    public Vector2 GetMaxScreenBounds()
+    {
+        return maxScreenBounds;
     }
 
     public void SpawnPlayer()
@@ -403,7 +429,10 @@ public class GameData : MonoBehaviour {
     public void FirePlayerProjectile()
     {
         Debug.Log("fire");
-        playerOne.FireProjectile();
+        if (playerOne != null)
+        {
+            playerOne.FireProjectile();
+        }
     }
 
     public void PlayerDestoryed()
