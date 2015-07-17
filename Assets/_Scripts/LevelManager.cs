@@ -27,9 +27,6 @@ public class LevelManager : MonoBehaviour
         Debug.Log("load level");
         gameData.SetPaddle("right", false);
         gameData.SetPaddle("left", false);
-
-        
-        //Brick.breakableCount = 0;
         gameData.PauseGame(false);
         
         levelName = name;
@@ -42,7 +39,7 @@ public class LevelManager : MonoBehaviour
         {
             musicPlayer.SetInMenu(true);
             Screen.showCursor = true;
-            if (levelName == "LoseScreen")
+            if (levelName == "EndScreen")
             {
                 //if player got high score, show name dialog instead of loading next level
                 if (gameData.GetPlayerScoreRank() < 26)
@@ -65,7 +62,6 @@ public class LevelManager : MonoBehaviour
         gameData.ResetPlayerLives();
         gameData.ResetPlayerScore();
         musicPlayer.SetInMenu(false);
-        //Brick.breakableCount = 0;
         Application.LoadLevel(1);
     }
 
@@ -80,7 +76,6 @@ public class LevelManager : MonoBehaviour
         gameData.SetPaddle("left", false);
 
         gameData.PauseGame(false);
-        //Brick.breakableCount = 0;
         if (gameAnalytics != null)
         {
             gameAnalytics.LogEvent(GameAnalytics.gaEventCategories.GameEvent, "restartLevel", "Restart Level");
@@ -91,19 +86,15 @@ public class LevelManager : MonoBehaviour
 
     public void ResetPlayer()
     {
-        //gameData.PauseGame(false);
         gameData.SetPaddle("right", false);
         gameData.SetPaddle("left", false);
         gameData.SetPlayerReady(false);
-        //playerBall.ShowBallDestruction();
-        //playerBall.LockBall();
     }
 
     public void LoadNextLevel()
     {
         musicPlayer.SetInMenu(false);
         gameData.PauseGame(false);
-        //Brick.breakableCount = 0;
         if (gameAnalytics != null)
         {
             gameAnalytics.LogEvent(GameAnalytics.gaEventCategories.GameEvent, "nextLevel", "Load Next Leve");
@@ -129,11 +120,9 @@ public class LevelManager : MonoBehaviour
     public void ShowLevelComplete()
     {
         musicPlayer.SetInMenu(true);
-        //playerBall.ShowBallDestruction();
-        //playerBall.LockBall();
-        gameData.PauseGame(true);
         gameHUD.ShowLevelComplete();
         gameData.GainOneLife();
+        gameData.PauseGame(true);
         if (gameAnalytics != null)
         {
             gameAnalytics.LogEvent(GameAnalytics.gaEventCategories.GameEvent, "levelComplete", Application.loadedLevelName + " Complete", gameData.GetPlayerScore());

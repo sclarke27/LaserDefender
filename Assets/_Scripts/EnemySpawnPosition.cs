@@ -21,6 +21,9 @@ public class EnemySpawnPosition : MonoBehaviour
     {
         switch (enemyType)
         {
+            case EnemySpawner.EnemyTypes.Boss:
+                Gizmos.DrawWireSphere(transform.position, 1.5f);
+                break;
             case EnemySpawner.EnemyTypes.Large:
                 Gizmos.DrawWireSphere(transform.position, 0.5f);
                 break;

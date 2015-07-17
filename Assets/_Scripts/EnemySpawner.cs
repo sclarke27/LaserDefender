@@ -3,7 +3,7 @@ using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
-
+    public GameObject EnemyShipBoss;
     public GameObject EnemyShipLarge;
     public GameObject EnemyShipMedium;
     public GameObject EnemyShipSmall;
@@ -19,12 +19,15 @@ public class EnemySpawner : MonoBehaviour
     private GameData gameData;
     private LevelManager levelManager;
     private bool formationSpawned = false;
+    private bool allEnemiesDead = false;
+    private bool continueProcessing = true;
 
     public enum EnemyTypes
     {
         Large,
         Medium,
-        Small
+        Small,
+        Boss
     }
 
     // Use this for initialization
@@ -57,6 +60,9 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemyShipObject = EnemyShipLarge;
         switch (enemyType)
         {
+            case EnemyTypes.Boss:
+                enemyShipObject = EnemyShipBoss;
+                break;
             case EnemyTypes.Large:
                 enemyShipObject = EnemyShipLarge;
                 break;
@@ -80,6 +86,7 @@ public class EnemySpawner : MonoBehaviour
 
     public bool AllEnemiesDead() 
     {
+        if (!formationSpawned) return false;
 
         foreach (Transform spawnPoint in transform)
         {
@@ -108,7 +115,7 @@ public class EnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!gameData.IsGamePaused())
+        if (!gameData.IsGamePaused() && continueProcessing)
         {
             if (!formationSpawned)
             {
@@ -118,32 +125,45 @@ public class EnemySpawner : MonoBehaviour
                     formationSpawned = true;
                 }
             }
-            if (AllEnemiesDead() && gameData.IsPlayerReady())
+            else
             {
-                levelManager.ShowLevelComplete();
+                foreach (EnemySpawner spawner in GameObject.FindObjectsOfType<EnemySpawner>())
+                {
+                    Debug.Log(spawner.AllEnemiesDead());
+                    allEnemiesDead = spawner.AllEnemiesDead();
+                }
+
             }
 
-            Vector3 newVector = transform.position;
-            if (moveLeft)
+            if (allEnemiesDead)
             {
-                newVector += Vector3.left * formationMovementAmount * Time.deltaTime;
-                if (newVector.x <= offsetWidth)
-                {
-                    newVector.x = offsetWidth;
-                    moveLeft = false;
-                }
+                levelManager.ShowLevelComplete();
+                continueProcessing = false;
             }
             else
             {
-                newVector += Vector3.right * formationMovementAmount * Time.deltaTime;
-                if (newVector.x >= (rightEdge.x - offsetWidth))
+                Vector3 newVector = transform.position;
+                if (moveLeft)
                 {
-                    newVector.x = (rightEdge.x - offsetWidth);
-                    moveLeft = true;
+                    newVector += Vector3.left * formationMovementAmount * Time.deltaTime;
+                    if (newVector.x <= offsetWidth)
+                    {
+                        newVector.x = offsetWidth;
+                        moveLeft = false;
+                    }
                 }
-            }
+                else
+                {
+                    newVector += Vector3.right * formationMovementAmount * Time.deltaTime;
+                    if (newVector.x >= (rightEdge.x - offsetWidth))
+                    {
+                        newVector.x = (rightEdge.x - offsetWidth);
+                        moveLeft = true;
+                    }
+                }
 
-            transform.position = newVector;
+                transform.position = newVector;
+            }
         }
     }
 }
